@@ -142,7 +142,8 @@ class DataLoader_MS2(data.Dataset):
             sample_set = []
             for seq in self.seq_list:  # iterate over each folder
                 #print("Seq:",seq)
-                img_list_left = sorted((self.root / "MS2" / "sync_data" / seq / sensor / "img_left").files("*.png"))
+                print("Root:",self.root)
+                img_list_left = sorted((self.root / "sync_data" / seq / sensor / "img_left").files("*.png"))
                 #img_list_right = sorted((self.root / "sync_data" / seq / sensor / "img_right").files("*.png"))
 
                 # construct N-snippet sequences (note: N=set_length)
@@ -174,23 +175,32 @@ class DataLoader_MS2(data.Dataset):
 
         tgt_img_rgb = load_as_float_img(sample_rgb["imgs"][0])
         tgt_img_thr = load_as_float_img(sample_thr["imgs"][0])
+        tgt_img_thr = process_image(tgt_img_thr, "minmax")
+        cv2.imwrite("trial_inp.png", tgt_img_thr)
 
         tgt_img_gray = cv2.cvtColor(tgt_img_rgb, cv2.COLOR_RGB2GRAY)
 
         w, h, c = tgt_img_thr.shape
+        #tgt_img_thr = np.squeeze(tgt_img_thr)
+        # print("ThrOrig:", tgt_img_thr.shape)
 
-        tgt_img_gray = cv2.resize(tgt_img_gray, (w*2, h*2))
+        tgt_img_gray = cv2.resize(tgt_img_gray, (int(h/2), int(w/2)))
+        tgt_img_thr = cv2.resize(tgt_img_thr, (0, 0), fx=0.5, fy=0.5)
+        #add cropping here
         tgt_img_gray = np.expand_dims(tgt_img_gray, axis=2)
-        #print("Gray:", tgt_img_gray.shape)
-        #print("Thr:", tgt_img_thr.shape)
-        img_thr = np.reshape(tgt_img_thr,(c, w, h))
-        img_gray = np.reshape(tgt_img_gray, (c, w*2, h*2))
+        tgt_img_thr = np.expand_dims(tgt_img_thr, axis=2)
+        # print("Gray:", tgt_img_gray.shape)
+        # print("Thr:", tgt_img_thr.shape)
+        img_thr = np.reshape(tgt_img_thr,(c, int(w/2), int(h/2)))
+        img_gray = np.reshape(tgt_img_gray, (c, int(w/2), int(h/2)))
 
         result = {}
         result["HR"] = img_gray
         result["LR"] = img_thr
+        result["LR_path"] = sample_thr["imgs"][0]
+        result["HR_path"] = sample_rgb["imgs"][0]
         return result
 
     
 
-   
+    

@@ -31,12 +31,13 @@ def create_dataset(dataset_opt, phase):
     from data.MS2_Dataset import DataLoader_MS2 as D
     #dataset = D(dataset_opt)
     if phase == 'train':
-        datalist_name = "/home/sara/Thermal_Img_Enhancement/filenames/ms2_train.txt"
+        datalist_name = "/ocean/projects/cis220039p/bansals/SPGG_ThImgEnh/code/filenames/ms2_train.txt"
     else:
-        datalist_name = "/home/sara/Thermal_Img_Enhancement/filenames/ms2_test.txt"
+        datalist_name = "/ocean/projects/cis220039p/bansals/SPGG_ThImgEnh/code/filenames/ms2_test.txt"
     
     dataset = D(
-    root="/home/sara/Thermal_Img_Enhancement",
+    #root="/ocean/projects/cis220039p/shared/datasets/MS2_full/",
+    root="/ocean/projects/cis220039p/bansals/Data/MS2/",
     datalist=datalist_name,
     data_split=phase,
     process="minmax",

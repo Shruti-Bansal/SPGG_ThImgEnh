@@ -48,7 +48,7 @@ def main():
     #tensorboard logger
     # if opt['use_tb_logger'] and 'debug' not in opt['name']:
     #     from tensorboardX import SummaryWriter
-    #     ltb_logger = SummaryWriter(log_dir='../tb_logger/' + opt['name'])
+    #     tb_logger = SummaryWriter(log_dir='../tb_logger/' + opt['name'])
 
     # random seed
     seed = opt['train']['manual_seed']
@@ -115,7 +115,7 @@ def main():
                     epoch, current_step, model.get_current_learning_rate())
                 for k, v in logs.items():
                     message += '{:s}: {:.4e} '.format(k, v)
-                    # tensorboard logger
+                    #tensorboard logger
                     # if opt['use_tb_logger'] and 'debug' not in opt['name']:
                     #     tb_logger.add_scalar(k, v, current_step)
                 logger.info(message)
@@ -153,8 +153,8 @@ def main():
                     crop_size = opt['scale']
                     gt_img = gt_img / 255.
                     sr_img = sr_img / 255.
-                    cropped_sr_img = sr_img[crop_size:-crop_size, crop_size:-crop_size, :]
-                    cropped_gt_img = gt_img[crop_size:-crop_size, crop_size:-crop_size, :]
+                    cropped_sr_img = sr_img[crop_size:-crop_size, crop_size:-crop_size]
+                    cropped_gt_img = gt_img[crop_size:-crop_size, crop_size:-crop_size]
                     avg_psnr += util.calculate_psnr(cropped_sr_img * 255, cropped_gt_img * 255)
 
                 avg_psnr = avg_psnr / idx

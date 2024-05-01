@@ -145,7 +145,7 @@ class SPSRModel(BaseModel):
                 self.random_pt = torch.Tensor(1, 1, 1, 1).to(self.device)
                 # gradient penalty loss
                 self.cri_gp = GradientPenaltyLoss(device=self.device).to(self.device)
-                self.l_gp_w = train_opt['gp_weigth']
+                self.l_gp_w = 10#train_opt['gp_weight']
 
             # gradient_pixel_loss
             if train_opt['gradient_pixel_weight'] > 0:
@@ -321,7 +321,7 @@ class SPSRModel(BaseModel):
             self.random_pt.uniform_()  # Draw random interpolation points
             interp = self.random_pt * self.fake_H.detach() + (1 - self.random_pt) * self.var_ref
             interp.requires_grad = True
-            interp_crit, _ = self.netD(interp)
+            interp_crit = self.netD(interp)
             l_d_gp = self.l_gp_w * self.cri_gp(interp, interp_crit) 
             l_d_total += l_d_gp
 

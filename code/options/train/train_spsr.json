@@ -2,33 +2,33 @@
   "name": "SPSR"   
   , "use_tb_logger": true
   , "model":"spsr"
-  , "scale": 2
-  , "gpu_ids": [0,1]
+  , "scale": 1
+  , "gpu_ids": [0, 1, 2, 3]
 
   , "datasets": {
     "train": {
       "name": "MS2"
       , "mode": "LRHR"
-      , "dataroot_HR": "/home/sara/Thermal_Img_Enhancement/MS2/sync_data/_2021-08-06-10-59-33/rgb/img_left"
-      , "dataroot_LR": "/home/sara/Thermal_Img_Enhancement/MS2/sync_data/_2021-08-06-10-59-33/thr/img_left"
+      , "dataroot_HR": "/ocean/projects/cis220039p/bansals/Data/MS2/sync_data/training_data/rgb/img_left"
+      , "dataroot_LR": "/ocean/projects/cis220039p/bansals/Data/MS2/sync_data/training_data/thr/img_left"
       , "subset_file": null
       , "use_shuffle": true
-      , "n_workers": 1
-      , "batch_size": 1
-      , "HR_size": 128
+      , "n_workers": 12
+      , "batch_size": 4
+      , "HR_size": 640
       , "use_flip": true
       , "use_rot": true
     }
     , "val": {
       "name": "Val"
       , "mode": "LRHR"
-      , "dataroot_HR": "/home/sara/Thermal_Img_Enhancement/MS2/sync_data/_2021-08-06-10-59-33_test/rgb/img_left"
-      , "dataroot_LR": "/home/sara/Thermal_Img_Enhancement/MS2/sync_data/_2021-08-06-10-59-33_test/thr/img_left"
+      , "dataroot_HR": "/ocean/projects/cis220039p/bansals/Data/MS2/sync_data/_2021-08-06-10-59-33_test/rgb/img_left"
+      , "dataroot_LR": "/ocean/projects/cis220039p/bansals/Data/MS2/sync_data/_2021-08-06-10-59-33_test/thr/img_left"
     }
   }
 
   , "path": {
-    "root": "/home/sara/SPSR" 
+    "root": "/ocean/projects/cis220039p/bansals/SPGG_ThImgEnh" 
   }
 
   , "network_G": {
@@ -67,21 +67,21 @@
     , "lr_gamma": 0.5
 
     , "pixel_criterion": "l1"
-    , "pixel_weight": 1e-2
+    , "pixel_weight": 0
     , "feature_criterion": "l1"
-    , "feature_weight": 1
-    , "gan_type": "vanilla"
-    , "gan_weight": 5e-3
-    , "gradient_pixel_weight": 1e-2
-    , "gradient_gan_weight": 5e-3
+    , "feature_weight": 0.5
+    , "gan_type": "lsgan"
+    , "gan_weight": 0.5
+    , "gradient_pixel_weight": 0
+    , "gradient_gan_weight": 0.5
     , "pixel_branch_criterion": "l1"
-    , "pixel_branch_weight": 5e-1
-    , "Branch_pretrain" : 1
-    , "Branch_init_iters" : 5000
+    , "pixel_branch_weight": 0
+    , "Branch_pretrain" : 0
+    , "Branch_init_iters" : 0
 
     , "manual_seed": 9
     , "niter": 5e5
-    , "val_freq": 5e3
+    , "val_freq": 500
   }
 
   , "logger": {
