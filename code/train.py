@@ -15,6 +15,7 @@ from utils import util
 from data import create_dataloader, create_dataset
 from models import create_model
 import os
+import wandb
 
 
 def main():
@@ -22,6 +23,8 @@ def main():
     # options
     parser = argparse.ArgumentParser()
     parser.add_argument('-opt', type=str, required=True, help='Path to option JSON file.')
+    #parser.add_argument("--WANDB_API_KEY", type=str, default="076c0af9710ccb99518a22d689475e8d24cbdd19")
+
     opt = option.parse(parser.parse_args().opt, is_train=True)
     opt = option.dict_to_nonedict(opt)  # Convert to NoneDict, which return None for missing key.
 
@@ -49,6 +52,24 @@ def main():
     # if opt['use_tb_logger'] and 'debug' not in opt['name']:
     #     from tensorboardX import SummaryWriter
     #     tb_logger = SummaryWriter(log_dir='../tb_logger/' + opt['name'])
+
+ 
+    os.environ["WANDB_API_KEY"] = "076c0af9710ccb99518a22d689475e8d24cbdd19"
+ 
+    wandb.init(
+            project="thermal-img-enhancement", 
+            config={
+                "learning_rate_G": opt['train']['lr_G'],
+                "learning_rate_D": opt['train']['lr_D'],
+                "learning_rate_grad_G": opt['train']['lr_G_grad'],
+                "iterations": opt['train']['niter'],
+                "val freq": opt['train']['val_freq'],
+                "gan_type": opt['train']['gan_type'],
+                "feat_loss_wt": opt['train']['feature_weight'],
+                "gan_wt": opt['train']['gan_weight'],
+                "grad_gan_wt": opt['train']['gradient_gan_weight'],
+            }
+        )
 
     # random seed
     seed = opt['train']['manual_seed']
@@ -113,6 +134,16 @@ def main():
                 logs = model.get_current_log()
                 message = '<epoch:{:3d}, iter:{:8,d}, lr:{:.3e}> '.format(
                     epoch, current_step, model.get_current_learning_rate())
+                
+                wandb.log({
+                    "current_step": current_step,
+                    "l_g_fea": logs['l_g_fea'],
+                    "l_g_gan": logs['l_g_gan'],
+                    "l_g_total": logs['l_g_total'],
+                    "l_d_total": logs['l_d_total'],
+                    "l_d_total_grad": logs['l_d_total_grad']
+                })
+                
                 for k, v in logs.items():
                     message += '{:s}: {:.4e} '.format(k, v)
                     #tensorboard logger
@@ -124,6 +155,7 @@ def main():
             # validation
             if current_step % opt['train']['val_freq'] == 0:
                 avg_psnr = 0.0
+                val_gan_loss = 0.0
                 idx = 0
                 for val_data in val_loader:
                     idx += 1
@@ -132,8 +164,10 @@ def main():
                     util.mkdir(img_dir)
 
                     model.feed_data(val_data)
-                    model.test()
+                    model.test(current_step)
 
+                    logs = model.get_current_log()
+                    val_gan_loss += logs['l_g_total']
                     visuals = model.get_current_visuals()
                     sr_img = util.tensor2img(visuals['SR'])  # uint8
                     gt_img = util.tensor2img(visuals['HR'])  # uint8
@@ -158,6 +192,12 @@ def main():
                     avg_psnr += util.calculate_psnr(cropped_sr_img * 255, cropped_gt_img * 255)
 
                 avg_psnr = avg_psnr / idx
+                val_loss = val_gan_loss / idx
+
+                wandb.log({
+                    "current_step": current_step,
+                    "val_l_g_gan": val_loss,
+                })
 
                 # log
                 logger.info('# Validation # PSNR: {:.4e}'.format(avg_psnr))
@@ -181,3 +221,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+    wandb.finish()

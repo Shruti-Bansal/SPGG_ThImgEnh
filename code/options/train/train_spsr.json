@@ -63,17 +63,17 @@
     , "weight_decay_D": 0
     , "beta1_D": 0.9
     , "lr_scheme": "MultiStepLR"
-    , "lr_steps": [50000, 100000, 200000, 300000]
+    , "lr_steps": [10000, 20000, 30000, 40000]
     , "lr_gamma": 0.5
 
     , "pixel_criterion": "l1"
     , "pixel_weight": 0
     , "feature_criterion": "l1"
-    , "feature_weight": 0.5
+    , "feature_weight": 0.1
     , "gan_type": "lsgan"
-    , "gan_weight": 0.5
+    , "gan_weight": 10
     , "gradient_pixel_weight": 0
-    , "gradient_gan_weight": 0.5
+    , "gradient_gan_weight": 0.1
     , "pixel_branch_criterion": "l1"
     , "pixel_branch_weight": 0
     , "Branch_pretrain" : 0
@@ -81,7 +81,7 @@
 
     , "manual_seed": 9
     , "niter": 5e5
-    , "val_freq": 500
+    , "val_freq": 2000
   }
 
   , "logger": {
